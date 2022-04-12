@@ -20,6 +20,7 @@ const cli = meow(
                        Assets, or Rich Text. This is useful for ensuring raw
                        Contentful responses will be compatible with your code.
     --localization -l  Output fields with localized values
+    --env-config,  -e  Set custom path for environment config. Defaults to ./getContentfulEnvironment.js
 
   Examples
     $ contentful-typescript-codegen -o src/@types/generated/contentful.d.ts
@@ -55,12 +56,20 @@ const cli = meow(
         alias: "l",
         isRequired: false,
       },
+      envConfig: {
+        type: "string",
+        alias: "e",
+        isRequired: false,
+      },
     },
   },
 )
 
 async function runCodegen(outputFile: string) {
-  const getEnvironmentPath = path.resolve(process.cwd(), "./getContentfulEnvironment.js")
+  const getEnvironmentPath = path.resolve(
+    process.cwd(),
+    cli.flags.envConfig || "./getContentfulEnvironment.js",
+  )
   const getEnvironment = require(getEnvironmentPath)
   const environment = await getEnvironment()
   const contentTypes = await environment.getContentTypes({ limit: 1000 })
